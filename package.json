@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "test": "nyc --reporter=html --reporter=text mocha --require ts-node/register --require source-map-support/register --recursive --full-trace --bail **/*.spec.ts",
-    "cover": "nyc report --reporter=text-lcov | coveralls"
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "keywords": [
     "codeworks",
