@@ -5,11 +5,19 @@
   "tasks": [
     {
       "type": "npm",
-      "script": "watch-ts",
+      "script": "build",
       "problemMatcher": [
         "$tsc-watch"
       ],
       "isBackground": true
+    },
+    {
+      "type": "typescript",
+      "tsconfig": "tsconfig.json",
+      "option": "watch",
+      "problemMatcher": [
+        "$tsc-watch"
+      ]
     }
   ]
 }

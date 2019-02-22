@@ -5,8 +5,13 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "test": "nyc --reporter=html --reporter=text mocha --require ts-node/register --require source-map-support/register --recursive --full-trace --bail **/*.spec.ts",
+    "serve": "nodemon --inspect ./dist/index.js",
+    "serve:tests": "npm run test && npm run serve",
+    "start": "npm run build && npm run watch",
+    "build": "rm -rf ./dist/* && npm run build-ts",
+    "build-ts": "tsc --build tsconfig.json",
+    "watch-ts": "tsc -w",
+    "test": "nyc --reporter=text mocha --require ts-node/register --require source-map-support/register --recursive --full-trace --bail **/*.spec.ts",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "keywords": [
@@ -26,6 +31,7 @@
     "nyc": "^13.3.0",
     "source-map-support": "^0.5.10",
     "ts-mocha": "^6.0.0",
+    "ts-node": "^8.0.2",
     "typescript": "^3.3.3333"
   },
   "repository": {
