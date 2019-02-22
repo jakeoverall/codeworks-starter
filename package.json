@@ -6,7 +6,8 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "ts-mocha -p tsconfig.json spec/**/*.spec.ts"
+    "test": "nyc --reporter=html --reporter=text mocha --require ts-node/register --require source-map-support/register --recursive --full-trace --bail **/*.spec.ts",
+    "cover": "nyc report --reporter=text-lcov | coveralls"
   },
   "keywords": [
     "codeworks",
@@ -19,7 +20,11 @@
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.6",
     "chai": "^4.2.0",
+    "coveralls": "^3.0.2",
+    "istanbul": "^0.4.5",
     "mocha": "^6.0.1",
+    "nyc": "^13.3.0",
+    "source-map-support": "^0.5.10",
     "ts-mocha": "^6.0.0",
     "typescript": "^3.3.3333"
   },
@@ -30,5 +35,32 @@
   "bugs": {
     "url": "https://github.com/jakeoverall/codeworks-starter/issues"
   },
-  "homepage": "https://github.com/jakeoverall/codeworks-starter#readme"
+  "homepage": "https://github.com/jakeoverall/codeworks-starter#readme",
+  "nyc": {
+    "include": [
+      "lib/*.ts",
+      "*.ts"
+    ],
+    "exclude": [
+      "**/*.d.ts",
+      "**/*.spec.ts",
+      "**/*.draft.ts",
+      "**/*.legacy.ts"
+    ],
+    "extension": [
+      ".ts",
+      ".json"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text",
+      "text-summary",
+      "html"
+    ],
+    "all": true,
+    "sourceMap": true,
+    "instrument": true
+  }
 }

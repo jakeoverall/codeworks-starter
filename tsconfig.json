@@ -18,6 +18,6 @@
     }
   },
   "include": [
-    "src/**/*"
+    "lib/**/*", "test/TestClass.spec.ts"
   ]
 }

@@ -7,6 +7,6 @@ describe('TestClass', () => {
     assert.isFunction(TestClass.TestMethod)
   })
   it("TestMethod returns a string", () => {
-    assert.isString(TestClass.TestMethod(7))
+    expect(TestClass.TestMethod(7)).to.equal("test7")
   })
 })
