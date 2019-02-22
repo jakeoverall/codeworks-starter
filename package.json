@@ -1,0 +1,34 @@
+{
+  "name": "codeworks-starter",
+  "version": "1.0.0",
+  "description": "A simple server starter",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "ts-mocha -p tsconfig.json spec/**/*.spec.ts"
+  },
+  "keywords": [
+    "codeworks",
+    "express",
+    "socket-io"
+  ],
+  "author": "Jake Overall <joverall22@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.6",
+    "chai": "^4.2.0",
+    "mocha": "^6.0.1",
+    "ts-mocha": "^6.0.0",
+    "typescript": "^3.3.3333"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jakeoverall/codeworks-starter.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jakeoverall/codeworks-starter/issues"
+  },
+  "homepage": "https://github.com/jakeoverall/codeworks-starter#readme"
+}
