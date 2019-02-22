@@ -19,5 +19,8 @@
   },
   "include": [
     "lib/**/*"
-  ]
+  ],
+  "typeAcquisition": {
+    "enable": true
+  }
 }
