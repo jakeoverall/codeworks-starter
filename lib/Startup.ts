@@ -6,6 +6,7 @@ import BaseService from "./Services/BaseService";
 import BaseController from "./BaseController";
 import { Dictionary } from "./utils/Dictionary";
 import { ServiceCollection, IServiceCollection } from "./IServiceCollection";
+import { ErrorBadRequest } from "./Errors/Errors";
 
 class ControllerCollection {
   _controllers: Dictionary<any> = {}
@@ -14,7 +15,7 @@ class ControllerCollection {
   }
 }
 
-class Startup {
+export class Startup {
   private static Services: ServiceCollection = new ServiceCollection();
   private static Controllers: ControllerCollection = new ControllerCollection();
 
@@ -45,7 +46,33 @@ class TestTransientService extends BaseService {
 
 // function _registerRoute(method: string, routeParams: string) { }
 
-export type ActionResult<T> = () => Promise<T> | T;
+export class Task<T> extends Promise<T> {
+  __fn: Function;
+  private async Run<T>(): Promise<T> {
+    try {
+      return await this.__fn()
+    } catch (err) {
+      throw err
+    }
+  }
+
+  get Result(): Promise<T> {
+    return this.Run()
+  }
+
+  constructor(fn: () => Promise<T> | T) {
+    super(() => { });
+    this.__fn = fn
+  }
+}
+
+// let x = new Task(model.find()).Result
+
+export type ActionResult<T> = {
+  status: number,
+  content: T
+}
+
 @Controller()
 class Bananas extends BaseController {
   _ts: TestScopedService;
@@ -56,6 +83,20 @@ class Bananas extends BaseController {
     this._ts2 = ts2;
     console.log("SCOPED", this._ts.id);
     console.log("TRANSIENT", this._ts2.id);
+  }
+
+  register() {
+    this.Get('bananas', new Task<number>(() => {
+      // throw new ErrorBadRequest("Testing Bad Requests")
+      return 7;
+    }))
+
+  }
+
+  async Test() {
+    super.Test()
+    await this.HandleGet('neatbananas')
+    await this.HandleGet('bananas')
   }
 }
 
@@ -80,12 +121,13 @@ Startup.ConfigureServices((services) => {
 })
 
 Startup.Configure((controllers) => {
-  controllers.Add("Kittens", Kittens)
+  controllers.Add("Bananas", Bananas)
 })
 
-Startup.HandleRequest("Kittens", (controllers, prop) => {
+Startup.HandleRequest("Bananas", (controllers, prop) => {
   let c = controllers._controllers[prop]
   let i = Injector.resolve<BaseController>(c)
+  i.Test()
   console.log("[SCOPED]", i);
   console.log("[TRANSIENT]", i);
 })

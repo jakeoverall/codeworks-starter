@@ -1,24 +1,46 @@
-import { ActionResult } from "./Startup";
+import { ActionResult, Task } from "./Startup";
 import { HttpContext } from "./HttpContext";
+import { IHttpError, ErrorNotFound } from "./Errors/Errors";
+import { Dictionary } from "./utils/Dictionary";
+import { guid } from "./guid";
+
+
 export default class BaseController {
+  gets: Dictionary<Task<any>> = {}
   protected readonly HttpContext: HttpContext;
   public readonly endpoint: string;
+  public readonly id: string;
   constructor(endpoint: string) {
     this.endpoint = endpoint;
     this.HttpContext = new HttpContext();
+    this.id = guid.NewGuid()
   }
-  async Get<T>(routeParams: string, actionResult: ActionResult<T>) {
+
+  Get<T>(routeParams: string, task: Task<T>) {
+    this.gets[routeParams] = task
+  }
+
+  async HandleGet(routeParams: string): Promise<any> {
     try {
-      let result = await actionResult();
-      if (!result) {
-        throw new Error(`[${this.endpoint.toUpperCase()} ERROR]`);
-      }
+      let task = this.gets[routeParams]
+      if (!task) { throw new ErrorNotFound() }
+      let content = await task.Result
+      return this.Send({ content, status: 200 })
     }
     catch (err) {
       this.SendError(err);
     }
   }
-  SendError(error: Error) {
-    console.error(error);
+
+  private SendError(error: IHttpError): void {
+    console.error("SEND TO CLIENT", error.status, error.message);
+  }
+  private Send<T>(actionResult: ActionResult<T>): Promise<T> {
+    console.log("SENDING TO CLINET", actionResult)
+    return null
+  }
+
+  Test() {
+    console.log("TESTING CONTROLLER", this.id);
   }
 }
