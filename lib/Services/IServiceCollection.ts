@@ -1,7 +1,7 @@
-import { ScopedService } from "./Services/ScopedService";
-import { SingletonService } from "./Services/SingletonService";
-import BaseService from "./Services/BaseService";
-import { Dictionary } from "./utils/Dictionary";
+import { ScopedService } from "./ScopedService";
+import { SingletonService } from "./SingletonService";
+import BaseService from "./BaseService";
+import { Dictionary } from "../utils/Dictionary";
 export interface IServiceCollection {
   AddScoped(name: string, service: typeof ScopedService): void;
   AddSingleton(name: string, service: typeof SingletonService): void;

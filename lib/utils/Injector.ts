@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Type } from "./Decorators";
+import { Type } from "./ControllerDecorators";
 
 /**
  * The Injector stores services and resolves requested instances.
