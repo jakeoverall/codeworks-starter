@@ -1,7 +1,7 @@
 import { ScopedService } from "./Services/ScopedService";
 import { Service } from "./Services/ServiceDecorator";
 import { Injector } from "./utils/Injector";
-import { Controller, HttpGet } from "./utils/ControllerDecorators";
+import { Controller, HttpGet, HttpPut } from "./utils/ControllerDecorators";
 import BaseService from "./Services/BaseService";
 import BaseController from "./BaseController";
 import { Dictionary } from "./utils/Dictionary";
@@ -73,16 +73,23 @@ class BananasController extends BaseController {
   }
 
   @HttpGet(":id")
-  GetBanana({ id }: any, body: any): any {
-    console.log(id, body, this._ts.repo.find())
-    return { id, body }
+  GetBanana({ id }: any): any {
+    console.log(id, this._ts.repo.find())
+    return id
+  }
+
+  @HttpPut(":id")
+  EditBanana({ id }: any, body: any): any {
+    console.log(id, body)
+    return body
   }
 
   async Test() {
     super.Test()
     await this.HandleTask('should/fail')
-    await this.HandleTask()
-    await this.HandleTask(':id', { method: "GET", params: { id: "17" }, body: { name: "Jim" } })
+    await this.HandleTask("", { method: "GET", params: {}, query: {} })
+    await this.HandleTask(':id', { method: "GET", params: { id: "17" } })
+    await this.HandleTask(':id', { method: "PUT", params: { id: "21" }, body: { name: "EDITING BANANA" } })
   }
 }
 
