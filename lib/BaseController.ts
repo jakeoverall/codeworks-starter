@@ -1,6 +1,6 @@
 import { Task } from "./utils/Task";
 import { HttpContext } from "./HttpContext";
-import { IHttpError, ErrorNotFound } from "./Errors/Errors";
+import { IHttpError, ErrorNotFound, ErrorBadRequest } from "./Errors/Errors";
 import { Dictionary } from "./utils/Dictionary";
 import { guid } from "./guid";
 
@@ -55,6 +55,7 @@ export default class BaseController {
       task.BindContext(this)
       task.Args = [req.params, req.body, req.query]
       let content = await task.Result
+      if (!content) { throw new ErrorBadRequest(routeParams) }
       return this.Send({ content, status: 200 })
     }
     catch (err) {

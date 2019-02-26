@@ -6,6 +6,7 @@ import BaseService from "./Services/BaseService";
 import BaseController from "./BaseController";
 import { Dictionary } from "./utils/Dictionary";
 import { ServiceCollection, IServiceCollection } from "./Services/IServiceCollection";
+import { ConfigureAuthService, AuthMiddleware, Authorize } from "./Middleware/Authorize";
 
 
 class ControllerCollection {
@@ -79,8 +80,9 @@ class BananasController extends BaseController {
   }
 
   @HttpPut(":id")
+  @Authorize("admin")
   EditBanana({ id }: any, body: any): any {
-    console.log(id, body)
+    console.log("admin access only", id, body)
     return body
   }
 
@@ -94,6 +96,10 @@ class BananasController extends BaseController {
 }
 
 Startup.ConfigureServices((services) => {
+  ConfigureAuthService({
+    Roles: ["public", "student", "admin", "super"],
+    UserRolePath: "account.role"
+  })
   // services.AddScoped('TestScopedService', TestScopedService)
   services.AddTransient('TestTransientService', TestTransientService)
 })
@@ -103,6 +109,7 @@ Startup.Configure((controllers) => {
 })
 
 Startup.HandleRequest("Bananas", (controllers, prop) => {
+  AuthMiddleware({ account: { role: "public" } })
   let c = controllers._controllers[prop]
   let i = Injector.resolve<BaseController>(c)
   i.Test()
