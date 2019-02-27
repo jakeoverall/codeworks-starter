@@ -26,6 +26,13 @@
         "$tsc-watch"
       ],
       "isBackground": true
+    },
+    {
+      "type": "npm",
+      "script": "build-ts",
+      "problemMatcher": [
+        "$tsc"
+      ]
     }
   ]
 }

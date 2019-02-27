@@ -8,9 +8,9 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "program": "${workspaceFolder}/lib/index.ts",
+      "program": "${workspaceFolder}/_sample/index.ts",
       "preLaunchTask": "tsc: watch - tsconfig.json",
-      "outFiles": ["${workspaceFolder}/dist/*"],
+      "outFiles": ["${workspaceFolder}/_sample_dist/_sample/*"],
       "restart": true,
       "runtimeExecutable": "nodemon",
       "runtimeArgs": [

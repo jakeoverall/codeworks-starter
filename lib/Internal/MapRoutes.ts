@@ -1,55 +1,46 @@
 import fs from 'fs';
-import Path from 'path'
 import BaseController, { RequestBasics, RequestType, ActionResult } from "../BaseController";
 import { Router } from 'express'
 import { Injector } from "../utils/Injector";
 
-const router = Router()
+let router = Router()
 export function MapRoutes(path: string): Router {
-  getFiles(path)
-  return router
+  return getControllersFromIndex(path)
 }
 
-function getFiles(path: string) {
-  let files: Array<string>
-  let root = Path.dirname(require.main.filename)
-  let controllersPath = root + '/./' + path
+function getControllersFromIndex(path: string) {
   try {
-    files = fs.readdirSync(controllersPath);
+    let controllers = require(path);
+    for (let name in controllers) {
+      registerController(controllers[name])
+    }
+    return router
   } catch (err) {
     throw err
   }
-  files.forEach(function (file) {
-    let test = new RegExp(/controller/, 'ig')
-    if (!test.test(file)) return;
-
-    let controller = require(controllersPath + '/' + file);
-    try {
-      controller.default ? registerController(controller.default) : registerController(controller)
-    } catch (e) {
-      console.error('[MODEL ERROR] unable to load model in ', file, e)
-    }
-  });
 }
 
-function registerController(controller: any) {
+function registerController(controller: any): Router {
   let resolved = Injector.resolve<BaseController>(controller)
-  for (let method in resolved.METHODS) {
+  Object.keys(resolved.METHODS).forEach(method => {
     let m = method as RequestType
     let params = resolved.METHODS[m]
-    for (let param in params) {
-      let p = resolved.endpoint + '/' + param
+    Object.keys(params).forEach(param => {
+      let p = "/" + resolved.endpoint + '/' + param
+      if (process.env.NODE_ENV == "debug") {
+        console.log(m, p);
+      }
       router[m](p, async (req, res) => {
         let c = Injector.resolve<BaseController>(controller)
-        let result: ActionResult
+        let result: ActionResult = { status: 200, content: {} }
         try {
           result = await c.HandleTask(param, req as RequestBasics)
-        } catch (e) {
-          res.status(e.status)
-        } finally {
           res.send(result.content)
+        } catch (e) {
+          res.status(e.status).send({ status: e.status, message: e.message })
         }
       })
-    }
-  }
+    })
+  })
+  return router
 }

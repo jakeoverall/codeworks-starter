@@ -22,18 +22,13 @@ export type RequestTypes = {
 };
 
 export default class BaseController {
-  METHODS: RequestTypes = {
-    get: {},
-    post: {},
-    put: {},
-    delete: {}
-  }
+  METHODS: RequestTypes
   public readonly endpoint: string;
   public readonly id: string;
   public params: Dictionary<string> = {};
   public query: Dictionary<string> = {};
   public body: Dictionary<any> = {};
-  name: string;
+  public name: string = "";
 
   constructor(endpoint: string = "") {
     if (!endpoint && !this.endpoint) { throw new Error("Failed to create controller you must provide an endpoint") }
@@ -42,6 +37,7 @@ export default class BaseController {
   }
 
   AddTask<T>(type: RequestType, routeParams: string, task: Task<T>) {
+    this.METHODS = this.METHODS || { get: {}, post: {}, put: {}, delete: {} }
     this.METHODS[type] = this.METHODS[type] || {}
     this.METHODS[type][routeParams] = task
   }

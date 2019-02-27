@@ -10,7 +10,11 @@ export class Task<T> extends Promise<T> {
     }
   }
   get Result(): Promise<T> {
-    return this.Run();
+    try {
+      return this.Run();
+    } catch (err) {
+      throw err
+    }
   }
   BindContext(ctx: any) {
     this.__fn = this.__fn.bind(ctx);
