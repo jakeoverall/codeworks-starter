@@ -1,4 +1,4 @@
-import BaseController from "../BaseController";
+import BaseController, { RequestType } from "../BaseController";
 import { Task } from "./Task";
 
 export const Controller = (endpoint: string): ClassDecorator => {
@@ -9,26 +9,24 @@ export const Controller = (endpoint: string): ClassDecorator => {
   };
 };
 
-export function HttpGet(routeParams: string = ""): MethodDecorator {
-  return function (target: BaseController, key: string, descriptor: PropertyDescriptor) {
-    target.AddTask("get", routeParams, new Task(descriptor.value))
+function HttpDecorator(method: RequestType, routeParams: string) {
+  return (target: BaseController, key: string, descriptor: PropertyDescriptor) => {
+    target.AddTask(method, routeParams, new Task(descriptor.value))
   }
 }
-export function HttpPost(routeParams: string = ""): MethodDecorator {
-  return function (target: BaseController, key: string, descriptor: PropertyDescriptor) {
-    target.AddTask("post", routeParams, new Task(descriptor.value))
-  }
-}
-export function HttpPut(routeParams: string = ""): MethodDecorator {
-  return function (target: BaseController, key: string, descriptor: PropertyDescriptor) {
-    target.AddTask("put", routeParams, new Task(descriptor.value))
-  }
-}
-export function HttpDelete(routeParams: string = ""): MethodDecorator {
-  return function (target: BaseController, key: string, descriptor: PropertyDescriptor) {
-    target.AddTask("delete", routeParams, new Task(descriptor.value))
-  }
-}
+
+export let HttpGet = (routeParams: string = ""): MethodDecorator =>
+  HttpDecorator("get", routeParams)
+
+export let HttpPost = (routeParams: string = ""): MethodDecorator =>
+  HttpDecorator("post", routeParams)
+
+export let HttpPut = (routeParams: string = ""): MethodDecorator =>
+  HttpDecorator("put", routeParams)
+
+export let HttpDelete = (routeParams: string = ""): MethodDecorator =>
+  HttpDecorator("delete", routeParams)
+
 
 export function Middleware(middleware: Function | Array<Function>): MethodDecorator {
   return function (target: any, key: string, descriptor: PropertyDescriptor) {
