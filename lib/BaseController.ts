@@ -60,8 +60,4 @@ export default class BaseController {
       throw err;
     }
   }
-
-  Test() {
-    console.log("TESTING CONTROLLER", this.name, this.id);
-  }
 }
