@@ -1,43 +1,45 @@
 import BaseController from "../BaseController";
 import { Task } from "./Task";
 
-/**
- * Type for what object is instances of
- */
-export interface Type<T> {
-  new(...args: any[]): T;
-}
-
-/**
- * Generic `ClassDecorator` type
- */
-export type GenericClassDecorator<T> = (target: T) => void;
-
 export const Controller = (endpoint: string): ClassDecorator => {
   return target => {
-    target.prototype.name = target.name
     // maybe do something with controller here
+    target.prototype.name = target.name
     target.prototype.endpoint = endpoint
   };
 };
 
-export function HttpGet<T>(routeParams: string = ""): MethodDecorator {
+export function HttpGet(routeParams: string = ""): MethodDecorator {
   return function (target: BaseController, key: string, descriptor: PropertyDescriptor) {
-    target.AddTask("GET", routeParams, new Task(descriptor.value))
+    target.AddTask("get", routeParams, new Task(descriptor.value))
   }
 }
-export function HttpPost<T>(routeParams: string = ""): MethodDecorator {
+export function HttpPost(routeParams: string = ""): MethodDecorator {
   return function (target: BaseController, key: string, descriptor: PropertyDescriptor) {
-    target.AddTask("POST", routeParams, new Task(descriptor.value))
+    target.AddTask("post", routeParams, new Task(descriptor.value))
   }
 }
-export function HttpPut<T>(routeParams: string = ""): MethodDecorator {
+export function HttpPut(routeParams: string = ""): MethodDecorator {
   return function (target: BaseController, key: string, descriptor: PropertyDescriptor) {
-    target.AddTask("PUT", routeParams, new Task(descriptor.value))
+    target.AddTask("put", routeParams, new Task(descriptor.value))
   }
 }
-export function HttpDelete<T>(routeParams: string = ""): MethodDecorator {
+export function HttpDelete(routeParams: string = ""): MethodDecorator {
   return function (target: BaseController, key: string, descriptor: PropertyDescriptor) {
-    target.AddTask("DELETE", routeParams, new Task(descriptor.value))
+    target.AddTask("delete", routeParams, new Task(descriptor.value))
+  }
+}
+
+export function Middleware(middleware: Function | Array<Function>): MethodDecorator {
+  return function (target: any, key: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+
+    descriptor.value = function (...args: any[]) {
+      return originalMethod.apply(this, args);
+    };
+
+    descriptor.value.middleware = middleware;
+
+    return descriptor;
   }
 }

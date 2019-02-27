@@ -1,5 +1,5 @@
 import { IService } from "./IService";
-import { guid } from "../guid";
+import { guid } from "../utils/guid";
 
 export default abstract class BaseService implements IService {
   public readonly id: string;
