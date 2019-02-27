@@ -18,6 +18,14 @@
       "problemMatcher": [
         "$tsc-watch"
       ]
+    },
+    {
+      "type": "npm",
+      "script": "watch-ts",
+      "problemMatcher": [
+        "$tsc-watch"
+      ],
+      "isBackground": true
     }
   ]
 }

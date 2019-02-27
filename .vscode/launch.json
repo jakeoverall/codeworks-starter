@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "Launch Program",
       "program": "${workspaceFolder}/lib/index.ts",
-      // "preLaunchTask": "tsc: watch - tsconfig.json",
+      "preLaunchTask": "tsc: watch - tsconfig.json",
       "outFiles": ["${workspaceFolder}/dist/*"],
       "restart": true,
       "runtimeExecutable": "nodemon",
