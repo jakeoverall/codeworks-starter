@@ -35,9 +35,9 @@ function registerController(controller: any): Router {
         let result: ActionResult = { status: 200, content: {} }
         try {
           result = await c.HandleTask(param, req as RequestBasics)
-          res.send(result.content)
+          return res.status(200).send(result)
         } catch (e) {
-          res.status(e.status).send({ status: e.status, message: e.message })
+          res.status(e.status || 400).send({ ...e, status: e.status, message: e.message })
         }
       })
     })

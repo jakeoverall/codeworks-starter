@@ -44,7 +44,7 @@ export function Authorize(role: string = "") {
       if (!__clientRequest.HasAccessLevel(role)) {
         throw new ErrorUnAuthorized()
       }
-      method.apply(this, args);
+      return method.apply(this, args);
     }
   }
 }

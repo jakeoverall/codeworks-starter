@@ -1,5 +1,7 @@
 import BaseController, { RequestType } from "../BaseController";
 import { Task } from "./Task";
+import { ClassType } from "class-transformer/ClassTransformer";
+import { transformAndValidate } from "class-transformer-validator";
 
 export const Controller = (endpoint: string): ClassDecorator => {
   return target => {
@@ -39,5 +41,27 @@ export function Middleware(middleware: Function | Array<Function>): MethodDecora
     descriptor.value.middleware = middleware;
 
     return descriptor;
+  }
+}
+
+export let FromBody = (classType: ClassType<{}>): MethodDecorator => {
+  return function (target: any, key: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+
+    descriptor.value = async function (...args: any[]) {
+      try {
+        args[1] = await transformAndValidate(
+          classType,
+          args[1],
+          {
+            validator: { whitelist: true },
+          })
+
+        return originalMethod.apply(this, args);
+      } catch (err) {
+        err.status = 400
+        throw err
+      }
+    };
   }
 }
