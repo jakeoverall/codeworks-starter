@@ -1,4 +1,4 @@
-import { IsNotEmpty, MinLength, IsNumber, Allow } from 'class-validator'
+import { IsNotEmpty, MinLength, IsNumber, Allow, IsEmail } from 'class-validator'
 
 export class Kitten {
 
@@ -7,6 +7,7 @@ export class Kitten {
 
   @IsNotEmpty()
   @MinLength(2)
+  @IsEmail()
   public name: string
 
   @IsNumber()

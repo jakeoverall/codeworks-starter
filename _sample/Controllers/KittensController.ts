@@ -1,19 +1,19 @@
-import { Controller, HttpGet, HttpPost, FromBody } from "../../lib";
-import BaseController from "../../lib/BaseController";
+import { Controller, HttpGet, HttpPost, FromBody, Authorize } from "../../lib";
+import BaseController from "../../lib/Controllers/BaseController";
 import { KittensService } from "../Services/KittensService";
 import { Kitten } from "../Models/Kitten";
 
 @Controller("kittens")
-export default class KittensController extends BaseController {
+export default class KittensController {
   _ks: KittensService;
   constructor(ks: KittensService) {
-    super();
     this._ks = ks;
   }
 
   @HttpGet()
-  async GetKittens() {
-    return Promise.resolve(this._ks.Find())
+  @Authorize('teacher')
+  GetKittens(_) {
+    return this._ks.Find()
   }
 
   @HttpGet(":id")
@@ -23,6 +23,7 @@ export default class KittensController extends BaseController {
 
   @HttpPost()
   @FromBody(Kitten)
+  @Authorize('teacher')
   async CreateKitten(_, kitten: Kitten) {
     return await this._ks.Create(kitten)
   }

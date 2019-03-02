@@ -3,6 +3,7 @@ import { Kitten } from "../Models/Kitten";
 import { guid } from "../../lib/utils/guid";
 
 export class KittensService {
+  public id: string = guid.NewGuid()
   private kittens: Array<Kitten> = [{
     _id: guid.NewGuid(),
     name: "Garfield"
@@ -13,7 +14,7 @@ export class KittensService {
     _id: guid.NewGuid(),
     name: "Tom"
   }]
-  constructor() { }
+
 
   async Find() {
     return this.kittens

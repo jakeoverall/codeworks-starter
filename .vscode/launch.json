@@ -9,10 +9,12 @@
       "request": "launch",
       "name": "Launch Program",
       "program": "${workspaceFolder}/_sample/index.ts",
-      "preLaunchTask": "tsc: watch - tsconfig.json",
-      "outFiles": ["${workspaceFolder}/_sample_dist/_sample/*"],
+      // "preLaunchTask": "tsc: watch - tsconfig.json",
+      "outFiles": [
+        "${workspaceFolder}/_sample_dist/_sample/*"
+      ],
       "restart": true,
-      "runtimeExecutable": "nodemon",
+      "runtimeExecutable": "node",
       "runtimeArgs": [
         "--nolazy",
         "-r",

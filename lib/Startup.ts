@@ -2,10 +2,13 @@ import { ServiceCollection, IServiceCollection } from "./Services/IServiceCollec
 import { MapRoutes } from "./Internal/MapRoutes";
 import { ConfigureAuthService, IAuthConfiguration } from "./Middleware/Authorize";
 import { Router } from "express";
+import { Dictionary } from "./utils/Dictionary";
+import { IController } from "./Controllers/IController";
+
 
 export class Startup {
   private Services: ServiceCollection = new ServiceCollection();
-  private _controllerRoutes: Router;
+  private _controllers: Dictionary<IController>;
 
   AuthService(config: IAuthConfiguration) {
     ConfigureAuthService(config)
@@ -17,9 +20,9 @@ export class Startup {
   // };
 
   set ControllerPath(path: string) {
-    this._controllerRoutes = MapRoutes(path)
+    this._controllers = MapRoutes(path)
   }
-  get ControllerRoutes() : Router {
-    return this._controllerRoutes
+  get Controllers() {
+    return this._controllers
   }
 }
