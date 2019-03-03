@@ -22,6 +22,7 @@ export class Program {
   routerMount: string;
   middleware: Array<RequestHandler>;
   constructor(config: IAppConfig) {
+    this.name = config.name
     this.configure = new Startup()
     this.expressApp = express()
     this.expressApp.use(bodyParser.json({ limit: '50mb' }))
@@ -29,19 +30,18 @@ export class Program {
     this.configure.ControllerPath = config.controllersPath
     if (config.logRequests) {
       this.expressApp.use((req, res, next) => {
-        console.log("INCOMING REQUEST");
+        console.log("[INCOMING REQUEST]", this.name, req.url);
         next()
       })
     }
-    this.middleware = config.middleware || []
+    this.middleware = config.middleware
     this.routerMount = config.routerMount
     this.router = Router()
+    if (this.middleware) {
+      this.expressApp.use(this.middleware)
+    }
     this.addControllers(this.configure.Controllers)
-    this.expressApp.use(this.middleware)
     this.expressApp.use(this.routerMount, this.router)
-    this.expressApp.use((req, res) => {
-      res.status(404).send("NOT FOUND")
-    })
   }
 
   protected addControllers(controllers: Dictionary<IController>): void {

@@ -14,7 +14,7 @@
         "${workspaceFolder}/_sample_dist/_sample/*"
       ],
       "restart": true,
-      "runtimeExecutable": "node",
+      "runtimeExecutable": "nodemon",
       "runtimeArgs": [
         "--nolazy",
         "-r",

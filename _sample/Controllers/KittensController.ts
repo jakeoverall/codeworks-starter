@@ -1,4 +1,4 @@
-import { Controller, HttpGet, HttpPost, FromBody, Authorize } from "../../lib";
+import { Controller, HttpGet, HttpPost, FromBody, Authorize, Middleware } from "../../lib";
 import BaseController from "../../lib/Controllers/BaseController";
 import { KittensService } from "../Services/KittensService";
 import { Kitten } from "../Models/Kitten";
@@ -11,7 +11,13 @@ export default class KittensController {
   }
 
   @HttpGet()
-  @Authorize('teacher')
+  @Middleware([function (req, res, next) {
+    console.log('MIDDLEWARE 1');
+    next()
+  }, function (req, res, next) {
+    console.log('MIDDLEWARE 2');
+    next()
+  }])
   GetKittens(_) {
     return this._ks.Find()
   }
