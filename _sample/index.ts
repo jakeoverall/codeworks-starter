@@ -1,4 +1,4 @@
-import { Program, EnableAuthorizeDecorator, SessionSerializer } from "../lib";
+import { Program, EnableAuthorizeDecorator } from "../lib";
 
 import sessions from './sessions'
 
@@ -11,10 +11,13 @@ let fakeDb = {
 let p = new Program({
   name: "TESTPROGRAM",
   controllersPath: __dirname + '/Controllers',
-  middleware: [sessions.test.middleware, (req, res, next) => {
-    req['user'] = fakeDb[req.session.uid]
-    next()
-  }, EnableAuthorizeDecorator],
+  middleware: [
+    sessions.test.middleware,
+    (req, res, next) => {
+      req['user'] = fakeDb[req['session'].uid]
+      next()
+    },
+    EnableAuthorizeDecorator],
   routerMount: "/"
 })
 p.configure.AuthService({
