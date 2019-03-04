@@ -1,12 +1,11 @@
 
 import { Controller, HttpGet, HttpPost, HttpPut, HttpDelete } from "../../lib";
-import BaseController from "../../lib/BaseController";
+import BaseController from "../../lib/Controllers/BaseController";
 
 @Controller("api/values")
-export default class ValuesController extends BaseController {
+export default class ValuesController {
   values: string[];
   constructor() {
-    super();
     this.values = ["value1", "value2"]
   }
 

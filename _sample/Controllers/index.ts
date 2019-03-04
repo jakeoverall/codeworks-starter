@@ -1,7 +1,9 @@
 
 import KittensController from "./KittensController";
-export {KittensController};
-        
+export { KittensController };
+
 import ValuesController from "./ValuesController";
-export {ValuesController};
-        
+export { ValuesController };
+
+import BrokenController from "./BrokenController";
+export { BrokenController };

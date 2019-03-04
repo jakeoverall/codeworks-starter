@@ -33,18 +33,23 @@ export const ConfigureAuthService = (config: IAuthConfiguration) => {
   __authConfig = config
 }
 
-export const AuthMiddleware = (user: any) => {
-  __clientRequest = new AuthService(user, __authConfig)
+export const AuthMiddleware = (req, res, next) => {
+  __clientRequest = new AuthService(req.user, __authConfig)
+  next()
 }
 
-export function Authorize(role: string = "") {
+export function Authorize(role: string | number = "", nextMethod?: string) {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
     const method = descriptor.value;
     descriptor.value = function (...args: any) {
       if (!__clientRequest.HasAccessLevel(role)) {
-        throw new ErrorUnAuthorized()
+        if (nextMethod && typeof target[nextMethod] == 'function') {
+          return target[nextMethod].apply(this, args)
+        } else {
+          throw new ErrorUnAuthorized()
+        }
       }
-      method.apply(this, args);
+      return method.apply(this, args);
     }
   }
 }
