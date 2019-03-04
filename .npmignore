@@ -1,5 +1,10 @@
-lib/
 coverage/
 .nyc_output/
 .vscode/
+_sample/
+_sample_dist/
+_dist/
 test/
+*.yml
+tsconfig.json
+

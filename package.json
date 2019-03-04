@@ -1,18 +1,12 @@
 {
   "name": "codeworks-starter",
-  "version": "1.0.0",
-  "description": "A simple server starter",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "version": "1.0.2",
+  "description": "Typescript express server",
+  "main": "lib/index.ts",
   "scripts": {
-    "serve": "nodemon --inspect ./dist/index.js",
-    "launchTS": "ts-node ./lib/index.ts",
-    "serve:tests": "npm run test && npm run serve",
     "start": "npm run build && npm run watch",
-    "build": "rm -rf ./dist/* && npm run build-ts",
-    "build-ts": "tsc --build tsconfig.json",
+    "build": "tsc --build tsconfig.json",
     "watch-ts": "tsc -w",
-    "watch:sample": "tsc -w --outDir _sample_dist ",
     "test:html": "nyc --reporter=html --reporter=text mocha --require ts-node/register --require source-map-support/register --recursive --full-trace --bail **/*.spec.ts",
     "test": "nyc --reporter=text mocha --require ts-node/register --require source-map-support/register --recursive --full-trace --bail **/*.spec.ts",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
@@ -85,6 +79,8 @@
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "inquirer": "^6.2.2",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "ts-node": "^8.0.2",
+    "typescript": "^3.3.3333"
   }
 }

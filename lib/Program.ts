@@ -1,12 +1,13 @@
-import express, { Router } from 'express';
-import bodyParser from 'body-parser'
+import express = require("express");
+import { Router } from 'express'
+import * as bodyParser from 'body-parser'
 import { Startup } from "./Startup";
 import { Dictionary } from "./utils/Dictionary";
 import { IController } from "./Controllers/IController";
 import { Injector } from './utils/Injector'
 import { RequestHandler, RequestHandlerParams } from "express-serve-static-core";
 
-export interface IAppConfig {
+export type IAppConfig = {
   controllersPath: string,
   routerMount: string,
   name: string,
@@ -52,7 +53,7 @@ export class Program {
     Object.keys(controllers).forEach(prop => {
       let controller = controllers[prop]
       try {
-        if (!controller.prototype.endpoint) { throw new Error("Invalid Controller") }
+        if (!controller.prototype.endpoint) { throw new Error("Invalid Controller no endpoint specified, please use the controller decorator") }
         this.router.use(controller.prototype.endpoint, this._buildRouter(controller))
         count++
       } catch (err) {
