@@ -1,5 +1,4 @@
-import { Controller, HttpGet, HttpPost, FromBody, Authorize, Middleware } from "../../lib";
-import BaseController from "../../lib/Controllers/BaseController";
+import { Controller, HttpGet, HttpPost, FromBody, Authorize, Middleware, UserService } from "../../lib";
 import { KittensService } from "../Services/KittensService";
 import { Kitten } from "../Models/Kitten";
 
@@ -12,7 +11,7 @@ export default class KittensController {
 
   @HttpGet()
   @Middleware([function (req, res, next) {
-    console.log('MIDDLEWARE 1');
+    console.log('MIDDLEWARE 1', UserService().user);
     next()
   }, function (req, res, next) {
     console.log('MIDDLEWARE 2');

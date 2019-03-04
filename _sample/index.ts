@@ -1,12 +1,23 @@
-import { Program, AuthMiddleware } from "../lib";
+import { Program, EnableAuthorizeDecorator } from "../lib";
+
+import sessions from './sessions'
+
+let fakeDb = {
+  "1a": { account: { role: 'super' } },
+  "2b": { account: { role: 'admin' } },
+  "3c": { account: { role: 'public' } }
+}
 
 let p = new Program({
   name: "TESTPROGRAM",
   controllersPath: __dirname + '/Controllers',
-  middleware: [(req, res, next) => {
-    req['user'] = { account: { role: 'teacher' } }
-    next()
-  }, AuthMiddleware],
+  middleware: [
+    sessions.test.middleware,
+    (req, res, next) => {
+      req['user'] = fakeDb[req['session'].uid]
+      next()
+    },
+    EnableAuthorizeDecorator],
   routerMount: "/"
 })
 p.configure.AuthService({

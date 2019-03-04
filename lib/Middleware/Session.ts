@@ -1,24 +1,40 @@
-var expressSession = require("express-session");
-var mongoStore = require("connect-mongodb-session")(expressSession);
+let expressSession = require("express-session");
+let mongoStore = require("connect-mongodb-session")(expressSession);
 
-var store = new mongoStore({
-  uri: "mongodb://student:student@ds151207.mlab.com:51207/bcw-junk", //CHANGE ME!!!!!!
-  collection: "Sessions"
-});
+export class ISerializerConfig {
+  store: {
+    uri: string,
+    collection: string
+  }
+  session: {
+    secret: string,
+    resave: boolean,
+    saveUninitialized: boolean
+    cookie: {
+      maxAge: number,
+      key: string,
+      domain: string
+    }
+  }
+}
 
-store.on("error", function (err) {
-  console.log("[SESSION ERROR]", err);
-});
+export class SessionSerializer {
+  private store: any;
+  middleware: any;
+  constructor(config: ISerializerConfig) {
+    this.store = this.createStore(config)
+    this.middleware = this.createSession(config)
+  }
 
-// @ts-ignore
-var session = expressSession({
-  secret: "you should change this", //CHANGE ME!!!!
-  cookie: {
-    maxAge: 1000 * 60 * 60 * 24 * 7 * 52 * 2,
-  },
-  store,
-  resave: true,
-  saveUninitialized: true
-});
+  private createStore(config: ISerializerConfig) {
+    let store = new mongoStore(config.store);
+    store.on("error", (err) => {
+      console.log("[SESSION ERROR]", err);
+    });
+    return store
+  }
 
-module.exports = session;
+  private createSession(config: ISerializerConfig) {
+    return expressSession({ ...config.session, store: this.store });
+  }
+}

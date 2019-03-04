@@ -28,6 +28,9 @@
   "include": [
     "_sample/**/*"
   ],
+  "exclude": [
+    "**/*.js"
+  ],
   "typeAcquisition": {
     "enable": true
   }

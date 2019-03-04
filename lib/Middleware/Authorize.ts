@@ -1,10 +1,12 @@
 import { getFromPath } from "../Extensions/Object";
 import { ErrorUnAuthorized } from "../Errors/Errors";
+import { RequestHandler } from "express-serve-static-core";
 
 class AuthService {
   readonly Roles: Array<string | number>;
   readonly user: any;
   readonly role: any;
+  session: any = {}
   constructor(user: any, config: IAuthConfiguration) {
     this.user = user
     this.role = getFromPath(user, config.UserRolePath)
@@ -14,7 +16,6 @@ class AuthService {
   HasAccessLevel(role: string | number = ""): boolean {
     return this.Roles.indexOf(role) <= this.Roles.indexOf(this.role)
   }
-
 }
 
 let __authConfig: IAuthConfiguration = {
@@ -23,6 +24,10 @@ let __authConfig: IAuthConfiguration = {
 }
 
 let __clientRequest: AuthService = new AuthService({}, __authConfig)
+
+export const UserService = () => {
+  return __clientRequest
+}
 
 export interface IAuthConfiguration {
   Roles: Array<string | number>
@@ -33,8 +38,12 @@ export const ConfigureAuthService = (config: IAuthConfiguration) => {
   __authConfig = config
 }
 
-export const AuthMiddleware = (req, res, next) => {
-  __clientRequest = new AuthService(req.user, __authConfig)
+/**
+ * To use you must have extended the express request to include req.user
+ */
+export const EnableAuthorizeDecorator: RequestHandler = (req, res, next) => {
+  __clientRequest = new AuthService(req['user'], __authConfig)
+  __clientRequest.session = req['session']
   next()
 }
 
