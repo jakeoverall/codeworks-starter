@@ -1,6 +1,5 @@
 
 import { Controller, HttpGet, HttpPost, HttpPut, HttpDelete } from "../../lib";
-import BaseController from "../../lib/Controllers/BaseController";
 
 @Controller("api/values")
 export default class ValuesController {
