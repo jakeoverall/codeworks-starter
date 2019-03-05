@@ -1,3 +1,5 @@
+import { NextFunction } from "express";
+
 let expressSession = require("express-session");
 let mongoStore = require("connect-mongodb-session")(expressSession);
 
@@ -21,9 +23,13 @@ export class ISerializerConfig {
 export class SessionSerializer {
   private store: any;
   middleware: any;
+  socketSession: (socket: SocketIO.Socket, next: NextFunction) => void;
   constructor(config: ISerializerConfig) {
     this.store = this.createStore(config)
     this.middleware = this.createSession(config)
+    this.socketSession = (socket, next) => {
+      this.middleware(socket.request, socket.request.res, next)
+     }
   }
 
   private createStore(config: ISerializerConfig) {
