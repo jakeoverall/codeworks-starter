@@ -9,7 +9,8 @@ export const COMMANDS = {
   USERJOINED: "USERJOINED",
   USERDISCONNECTED: "USERDISCONNECTED",
   JOINGROUP: "JOINGROUP",
-  LEAVEGROUP: "LEAVEGROUP"
+  LEAVEGROUP: "LEAVEGROUP",
+  ERROR: "ERROR"
 }
 
 export class Channel {
@@ -54,7 +55,7 @@ export class Channel {
       this.SendToGroup(room, {
         message: "User Disconnected",
         socketId: socket.id,
-        user: UserService().user
+        user: socket['user']
       })
     }
     this.io.of(this.channelName).emit(COMMANDS.USERDISCONNECTED, socket.id);
@@ -64,7 +65,7 @@ export class Channel {
     try {
       UserService().socket.emit(COMMANDS.SELFMESSAGE, payload)
     } catch (err) {
-      console.error(err);
+      this.SendError(COMMANDS.SELFMESSAGE, err)
     }
   }
 
@@ -91,7 +92,7 @@ export class Channel {
     try {
       UserService().socket.join(groupName)
     } catch (err) {
-      console.error(err);
+      this.SendError(COMMANDS.JOINGROUP, err)
     }
     this.io.of(this.channelName).to(groupName).emit(COMMANDS.USERJOINED)
   }
@@ -100,13 +101,13 @@ export class Channel {
     try {
       UserService().socket.leave(groupName)
     } catch (err) {
-      console.error(err);
+      this.SendError(COMMANDS.LEAVEGROUP, err)
     }
   }
 
   SendError(command: string, err: Error) {
     try {
-      UserService().socket.emit(COMMANDS.SELFMESSAGE, { ...err, channel: this.channelName, command })
+      UserService().socket.emit(COMMANDS.ERROR, { ...err, message: err.message, channel: this.channelName, command })
     } catch (err) {
       console.error(err);
     }

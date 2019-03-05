@@ -62,8 +62,8 @@ export function Authorize(role: string | number = "", nextMethod?: string) {
     const method = descriptor.value;
     descriptor.value = function (...args: any) {
       if (!__clientRequest.HasAccessLevel(role)) {
-        if (nextMethod && typeof target[nextMethod] == 'function') {
-          return target[nextMethod].apply(this, args)
+        if (typeof target.SendError == "function") {
+          return target.SendError.apply(target, [key, new ErrorUnAuthorized()])
         } else {
           throw new ErrorUnAuthorized()
         }

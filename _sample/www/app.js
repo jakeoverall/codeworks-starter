@@ -3,7 +3,7 @@ let socket = io.connect();
 let values = io.connect('/ValuesChannel');
 let messages = document.getElementById("messages")
 
-function writeMessage(message){
+function writeMessage(message) {
   console.log(message)
   let li = document.createElement('li')
   li.innerText = message
@@ -12,9 +12,11 @@ function writeMessage(message){
 
 values.on('USERJOINED', writeMessage)
 values.on('BLARG', writeMessage)
+values.on('ERROR', writeMessage)
 values.on("/ValuesChannel", writeMessage)
 
 socket.on('message', writeMessage)
+socket.on('ERROR', (err) => console.error(err))
 
 function sendMessage(e) {
   e.preventDefault()
