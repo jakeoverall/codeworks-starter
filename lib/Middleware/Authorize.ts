@@ -15,6 +15,10 @@ class AuthService {
     this.Roles = config.Roles
   }
 
+  hasAccess(role: string | number = "") {
+    return this.HasAccessLevel(role)
+  }
+
   HasAccessLevel(role: string | number = ""): boolean {
     return this.Roles.indexOf(role) <= this.Roles.indexOf(this.role)
   }
@@ -48,25 +52,21 @@ export const EnableAuthorizeDecorator: RequestHandler = (req, res, next) => {
   __clientRequest.session = req['session']
   next()
 }
-
+/**
+ * To use you must have extended the socket.request to include user
+ */
 export const EnableAuthorizedSocket = (socket: socketIO.Socket, next: NextFunction) => {
-  __clientRequest = new AuthService(socket.request['user'], __authConfig)
-  __clientRequest.session = socket.request['session']
-  __clientRequest.socket = socket
+  socket.request['authService'] = new AuthService(socket.request['user'], __authConfig)
   next()
 }
 
 
-export function Authorize(role: string | number = "", nextMethod?: string) {
+export function Authorize(role: string | number = "") {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
     const method = descriptor.value;
     descriptor.value = function (...args: any) {
       if (!__clientRequest.HasAccessLevel(role)) {
-        if (typeof target.SendError == "function") {
-          return target.SendError.apply(target, [key, new ErrorUnAuthorized()])
-        } else {
-          throw new ErrorUnAuthorized()
-        }
+        throw new ErrorUnAuthorized()
       }
       return method.apply(this, args);
     }

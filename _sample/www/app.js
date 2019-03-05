@@ -3,19 +3,29 @@ let socket = io.connect();
 let values = io.connect('/ValuesChannel');
 let messages = document.getElementById("messages")
 
-function writeMessage(message) {
-  console.log(message)
+function writeMessage(command, message) {
+  console.log(command, message)
   let li = document.createElement('li')
   li.innerText = message
   messages.appendChild(li)
 }
 
-values.on('USERJOINED', writeMessage)
-values.on('BLARG', writeMessage)
-values.on('ERROR', writeMessage)
+let commands = {
+  GROUPMESSAGE: "GROUPMESSAGE",
+  CHANNELMESSAGE: "CHANNELMESSAGE",
+  PRIVATEMESSAGE: "PRIVATEMESSAGE",
+  SELFMESSAGE: "SELFMESSAGE",
+  JOINGROUP: "JOINGROUP",
+  LEAVEGROUP: "LEAVEGROUP",
+  USERJOINED: "USERJOINED",
+  USERLEFT: "USERLEFT",
+  USERDISCONNECTED: "USERDISCONNECTED",
+  ERROR: "ERROR"
+}
+for (let command in commands) {
+  values.on(command, (payload) => writeMessage(command, payload))
+}
 values.on("/ValuesChannel", writeMessage)
-
-socket.on('message', writeMessage)
 socket.on('ERROR', (err) => console.error(err))
 
 function sendMessage(e) {

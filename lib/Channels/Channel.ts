@@ -1,16 +1,27 @@
 import socketIO from 'socket.io'
 import { UserService } from '../Middleware/Authorize'
+import { ErrorUnAuthorized, ErrorBadRequest } from "../Errors/Errors";
 
 export const COMMANDS = {
   GROUPMESSAGE: "GROUPMESSAGE",
   CHANNELMESSAGE: "CHANNELMESSAGE",
   PRIVATEMESSAGE: "PRIVATEMESSAGE",
   SELFMESSAGE: "SELFMESSAGE",
-  USERJOINED: "USERJOINED",
-  USERDISCONNECTED: "USERDISCONNECTED",
   JOINGROUP: "JOINGROUP",
   LEAVEGROUP: "LEAVEGROUP",
+  USERJOINED: "USERJOINED",
+  USERLEFT: "USERLEFT",
+  USERDISCONNECTED: "USERDISCONNECTED",
   ERROR: "ERROR"
+}
+
+const COMMANDMETHODS = {
+  GROUPMESSAGE: "SendToGroup",
+  CHANNELMESSAGE: "SendToChannel",
+  PRIVATEMESSAGE: "SendToConnectionId",
+  SELFMESSAGE: "SendToMe",
+  JOINGROUP: "JoinGroup",
+  LEAVEGROUP: "LeaveGroup"
 }
 
 export class Channel {
@@ -36,43 +47,38 @@ export class Channel {
 
   OnConnected(channel) {
     this.io.of(this.channelName).on('connection', (socket) => {
-      this.io.of(this.channelName).emit(this.channelName, `JOINED ${this.channelName}`)
-      this.io.of(this.channelName).emit(COMMANDS.USERJOINED, socket.id)
+      let user = socket.request.user;
+      socket.emit(this.channelName, `JOINED ${this.channelName}`)
+      this.io.of(this.channelName).emit(COMMANDS.USERJOINED, { socketId: socket.id, user })
 
-      socket.on(COMMANDS.CHANNELMESSAGE, this.SendToChannel.bind(this))
-      socket.on(COMMANDS.GROUPMESSAGE, (payload) => this.SendToGroup(payload.groupName, payload))
-      socket.on(COMMANDS.PRIVATEMESSAGE, this.SendToConnectionId.bind(this))
-      socket.on(COMMANDS.SELFMESSAGE, this.SendToMe.bind(this))
-      socket.on(COMMANDS.JOINGROUP, this.JoinGroup.bind(this))
-      socket.on(COMMANDS.LEAVEGROUP, this.LeaveGroup.bind(this))
-      socket.on("disconnect", this.OnDisconnected.bind(this))
+      for (let command in COMMANDMETHODS) {
+        socket.on(command, (payload) => {
+          let method = COMMANDMETHODS[command]
+          this[method](socket, payload)
+        })
+      }
+      socket.on("disconnect", () => this.OnDisconnected(user))
       channel.init(this, socket)
     });
   }
 
-  OnDisconnected(socket: socketIO.Socket) {
-    for (let room in socket.rooms) {
-      this.SendToGroup(room, {
-        message: "User Disconnected",
-        socketId: socket.id,
-        user: socket['user']
-      })
-    }
-    this.io.of(this.channelName).emit(COMMANDS.USERDISCONNECTED, socket.id);
+  OnDisconnected(user: any) {
+    this.io.of(this.channelName).emit(COMMANDS.USERDISCONNECTED, user);
   }
 
-  SendToMe(payload: any) {
+  SendToMe(socket: socketIO.Socket, payload: any) {
     try {
-      UserService().socket.emit(COMMANDS.SELFMESSAGE, payload)
+      socket.emit(COMMANDS.SELFMESSAGE, payload)
     } catch (err) {
-      this.SendError(COMMANDS.SELFMESSAGE, err)
+      this.SendError(socket, COMMANDS.SELFMESSAGE, err)
     }
   }
 
-  SendToConnectionId(payload: any) {
+  SendToConnectionId(socket: socketIO.Socket, payload: any) {
     let connectionId = payload.connectionId
     if (!connectionId) {
       return this.SendError(
+        socket,
         COMMANDS.PRIVATEMESSAGE,
         new Error("Invalid Payload must provide a connectionId")
       )
@@ -80,36 +86,58 @@ export class Channel {
     this.io.to(connectionId).emit(COMMANDS.PRIVATEMESSAGE, payload)
   }
 
-  SendToChannel(payload: any) {
+  SendToChannel(socket: socketIO.Socket, payload: any) {
     this.io.of(this.channelName).emit(COMMANDS.CHANNELMESSAGE, payload)
   }
 
-  SendToGroup(groupName: string, payload: any) {
-    this.io.of(this.channelName).to(groupName).emit(COMMANDS.GROUPMESSAGE, payload)
-  }
-
-  JoinGroup(groupName: string) {
-    try {
-      UserService().socket.join(groupName)
-    } catch (err) {
-      this.SendError(COMMANDS.JOINGROUP, err)
+  SendToGroup(socket: socketIO.Socket, payload: any) {
+    if (!payload.groupName || !payload.data) {
+      return this.SendError(socket, COMMANDS.GROUPMESSAGE, new ErrorBadRequest("Payload must specify groupName && data"))
     }
-    this.io.of(this.channelName).to(groupName).emit(COMMANDS.USERJOINED)
+    let group = this.channelName + ":" + payload.groupName
+    if (!socket.rooms[group]) { return }
+    this.io.of(this.channelName).to(group).emit(COMMANDS.GROUPMESSAGE, payload)
   }
 
-  LeaveGroup(groupName: string) {
+  JoinGroup(socket: socketIO.Socket, groupName: string) {
     try {
-      UserService().socket.leave(groupName)
+      let group = this.channelName + ":" + groupName
+      if (socket.rooms[group]) { return }
+      socket.join(group)
+      this.io.of(this.channelName).to(group).emit(COMMANDS.USERJOINED, socket.request['user'])
     } catch (err) {
-      this.SendError(COMMANDS.LEAVEGROUP, err)
+      return this.SendError(socket, COMMANDS.JOINGROUP, err)
     }
   }
 
-  SendError(command: string, err: Error) {
+  LeaveGroup(socket: socketIO.Socket, groupName: string) {
     try {
-      UserService().socket.emit(COMMANDS.ERROR, { ...err, message: err.message, channel: this.channelName, command })
+      let group = this.channelName + ":" + groupName
+      if (!socket.rooms[group]) { return }
+      socket.leave(group)
+      this.io.of(this.channelName).to(group).emit(COMMANDS.USERLEFT, socket.request['user'])
+    } catch (err) {
+      return this.SendError(socket, COMMANDS.LEAVEGROUP, err)
+    }
+  }
+
+  SendError(socket: socketIO.Socket, command: string, err: Error) {
+    try {
+      socket.emit(COMMANDS.ERROR, { ...err, message: err.message, channel: this.channelName, command })
     } catch (err) {
       console.error(err);
+    }
+  }
+
+  Authorize(role: string | number, socket: socketIO.Socket) {
+    try {
+      if (!socket.request['authService'].hasAccess(role)) {
+        throw new ErrorUnAuthorized()
+      }
+      return true
+    } catch (err) {
+      this.SendError(socket, "Access Denied", err)
+      return false
     }
   }
 }
