@@ -10,6 +10,7 @@
   "scripts": {
     "start": "npm run build && npm run watch",
     "build": "tsc --build tsconfig.json",
+    "package": "tsc --build build.json",
     "watch-ts": "tsc -w",
     "test:html": "nyc --reporter=html --reporter=text mocha --require ts-node/register --require source-map-support/register --recursive --full-trace --bail **/*.spec.ts",
     "test": "nyc --reporter=text mocha --require ts-node/register --require source-map-support/register --recursive --full-trace --bail **/*.spec.ts",

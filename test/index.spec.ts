@@ -15,8 +15,7 @@ describe("PROGRAM", () => {
 	it("Register and Call controller methods with api call", (done) => {
 
 		session(p.expressApp)
-			.request()
-			.get("/kittens")
+			.request("get", "/kittens")
 			.timeout(2000)
 			.expect("Content-Type", /json/)
 			.expect(200)

@@ -3,7 +3,7 @@ import socketIO from 'socket.io'
 let expressSession = require("express-session");
 let sessionstore = require("sessionstore");
 
-export type DBTypes = "mongodb" | "couchdb" | "tingodb" | "redis" | "memcached" | "inmemmory" | "elasticsearch"
+export type DBTypes = "mongodb" | "couchdb" | "tingodb" | "redis" | "memcached" | "inmemory" | "elasticsearch"
 
 export class ISerializerConfig {
   store: {

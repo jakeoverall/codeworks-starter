@@ -1,5 +1,5 @@
 import socketIO from 'socket.io'
-import { Channel, Authorize } from "../../lib";
+import { Channel } from "../../lib";
 
 export class ValuesChannel extends Channel {
   init(context: Channel, socket: socketIO.Socket): void {

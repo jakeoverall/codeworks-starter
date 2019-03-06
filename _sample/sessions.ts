@@ -4,10 +4,9 @@ export default {
   test() {
     return new SessionSerializer({
       store: {
-        type: "tingodb",
+        type: "inmemory",
         collectionName: "Sessions",
-        timeout: 10000,
-        dbPath: __dirname + '/'
+        timeout: 10000
       },
       session: {
         secret: 'CHANGEME',
