@@ -1,6 +1,6 @@
 {
   "name": "codeworks-starter",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Typescript express server",
   "main": "dist/index.js",
   "files": [
@@ -81,7 +81,6 @@
     "class-transformer": "^0.2.0",
     "class-transformer-validator": "^0.6.0",
     "class-validator": "^0.9.1",
-    "connect-mongodb-session": "^2.1.1",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
     "inquirer": "^6.2.2",
