@@ -1,12 +1,24 @@
 import { NextFunction } from "express";
 import socketIO from 'socket.io'
 let expressSession = require("express-session");
-let mongoStore = require("connect-mongodb-session")(expressSession);
+let sessionstore = require("sessionstore");
+
+export type DBTypes = "mongodb" | "couchdb" | "tingodb" | "redis" | "memcached" | "inmemmory" | "elasticsearch"
 
 export class ISerializerConfig {
   store: {
-    uri: string,
-    collection: string
+    type: DBTypes,
+    host?: string
+    port?: number
+    dbName?: string
+    collectionName?: string
+    timeout?: number
+    authSource?: string
+    username?: string
+    password?: string
+    url?: string,
+    dbPath?: string,
+    prefix?: string
   }
   session: {
     secret: string,
@@ -33,9 +45,9 @@ export class SessionSerializer {
   }
 
   private createStore(config: ISerializerConfig) {
-    let store = new mongoStore(config.store);
+    let store = sessionstore.createSessionStore(config.store);
     store.on("error", (err) => {
-      console.log("[SESSION ERROR]", err);
+      console.error("[SESSION ERROR]", err);
     });
     return store
   }
