@@ -28,7 +28,7 @@ export default class KittensController {
 
   @HttpPost()
   @FromBody(Kitten)
-  @Authorize('teacher')
+  @Authorize('admin')
   async CreateKitten(_, kitten: Kitten) {
     return await this._ks.Create(kitten)
   }
