@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Simple Test</title>
+</head>
+
+<body>
+
+  <div>
+    <h3>Messages</h3>
+    <form onsubmit="sendMessage(event)">
+      <input type="text" name="command">
+      <input type="text" name="message">
+      <button type="submit">SEND</button>
+    </form>
+    <ul id="messages"></ul>
+  </div>
+
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

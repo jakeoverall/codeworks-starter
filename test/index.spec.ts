@@ -2,21 +2,11 @@ import { Program } from '../lib/index'
 import { assert } from 'chai'
 import { describe, it } from 'mocha'
 import request from 'supertest'
+import p from '../_sample/server'
+import session from 'supertest-session'
 
-let p = new Program({
-	name: "TEST",
-	controllersPath: __dirname + '/../_sample/Controllers',
-	routerMount: "",
-	logRequests: true,
-	middleware: [(req, _, next) => {
-		req['user'] = { account: "admin" }
-		next()
-	}]
-})
-p.configure.AuthService({
-	Roles: ["public", "student", "teacher", "admin", "super"],
-	UserRolePath: "account.role"
-})
+
+
 
 describe("PROGRAM", () => {
 	it("Can Access from Index", () => {
@@ -24,8 +14,8 @@ describe("PROGRAM", () => {
 	})
 	it("Register and Call controller methods with api call", (done) => {
 
-		request(p.expressApp)
-			.get("/kittens")
+		session(p.expressApp)
+			.request("get", "/kittens")
 			.timeout(2000)
 			.expect("Content-Type", /json/)
 			.expect(200)
