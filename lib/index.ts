@@ -1,4 +1,4 @@
-export * from './Program'
+export * from './Area'
 export * from './Startup'
 export * from './Controllers/Task'
 export * from './Controllers/ControllerDecorators'

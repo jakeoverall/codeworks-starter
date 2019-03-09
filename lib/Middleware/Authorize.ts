@@ -1,15 +1,15 @@
 import { getFromPath } from "../Extensions/Object";
 import { ErrorUnAuthorized } from "../Errors/Errors";
 import { RequestHandler, NextFunction } from "express-serve-static-core";
-import socketIO from 'socket.io'
+import { Socket } from 'socket.io'
 
-class AuthService {
+class SessionUserService {
   readonly Roles: Array<string | number>;
   readonly user: any;
   readonly role: any;
   session: any = {}
-  socket: socketIO.Socket;
-  constructor(user: any, config: IAuthConfiguration) {
+  socket: Socket;
+  constructor(user: any, config: IUserSessionConfig) {
     this.user = user
     this.role = getFromPath(user, config.UserRolePath)
     this.Roles = config.Roles
@@ -24,23 +24,23 @@ class AuthService {
   }
 }
 
-let __authConfig: IAuthConfiguration = {
+let __authConfig: IUserSessionConfig = {
   Roles: ["public", "user", "admin"],
   UserRolePath: "role"
 }
 
-let __clientRequest: AuthService = new AuthService({}, __authConfig)
+let __clientRequest: SessionUserService = new SessionUserService({}, __authConfig)
 
-export const UserService = () => {
+export const SessionUser = () => {
   return __clientRequest
 }
 
-export interface IAuthConfiguration {
+export interface IUserSessionConfig {
   Roles: Array<string | number>
   UserRolePath?: string
 }
 
-export const ConfigureAuthService = (config: IAuthConfiguration) => {
+export const ConfigureSessionUserService = (config: IUserSessionConfig) => {
   __authConfig = config
 }
 
@@ -48,19 +48,22 @@ export const ConfigureAuthService = (config: IAuthConfiguration) => {
  * To use you must have extended the express request to include req.user
  */
 export const EnableAuthorizeDecorator: RequestHandler = (req, res, next) => {
-  __clientRequest = new AuthService(req['user'], __authConfig)
+  __clientRequest = new SessionUserService(req['user'], __authConfig)
   __clientRequest.session = req['session']
   next()
 }
 /**
  * To use you must have extended the socket.request to include user
  */
-export const EnableAuthorizedSocket = (socket: socketIO.Socket, next: NextFunction) => {
-  socket.request['authService'] = new AuthService(socket.request['user'], __authConfig)
+export const EnableSessionUserSocket = (socket: Socket, next: NextFunction) => {
+  socket.request['authService'] = new SessionUserService(socket.request['user'], __authConfig)
   next()
 }
 
-
+/**
+ * To use EnableAuthorizeDecorator middleware when configuring the area
+ * @param role
+ */
 export function Authorize(role: string | number = "") {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
     const method = descriptor.value;
@@ -71,8 +74,4 @@ export function Authorize(role: string | number = "") {
       return method.apply(this, args);
     }
   }
-}
-
-export const User = () => {
-  return __clientRequest.user
 }

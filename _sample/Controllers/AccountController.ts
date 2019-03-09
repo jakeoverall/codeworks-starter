@@ -1,12 +1,12 @@
 
-import { Controller, HttpGet, HttpPost, HttpPut, HttpDelete, UserService, Middleware, Authorize } from "../../lib";
+import { Controller, HttpGet, HttpPost, HttpPut, HttpDelete, SessionUser, Middleware, Authorize } from "../../lib";
 
 @Controller("Account")
 export default class AccountController {
   @HttpGet()
   @Authorize("public")
   async Get() {
-    return UserService().user
+    return SessionUser().user
   }
 
   @HttpPost("login")
@@ -23,7 +23,7 @@ export default class AccountController {
         id = "3c"
         break;
     }
-    UserService().session.uid = id
+    SessionUser().session.uid = id
     return "success"
   }
 
@@ -32,7 +32,7 @@ export default class AccountController {
 
   }
 
-  @HttpDelete()
+  @HttpDelete("logout")
   @Middleware((req, res, next) => {
     req.session.destroy()
     next()
