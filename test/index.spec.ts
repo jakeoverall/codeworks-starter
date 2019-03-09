@@ -1,20 +1,36 @@
-import { Program } from '../lib/index'
+import { Area } from '../lib/index'
 import { assert } from 'chai'
 import { describe, it } from 'mocha'
-import request from 'supertest'
-import p from '../_sample/server'
+import testArea from '../_sample/server'
 import session from 'supertest-session'
+import KittensController from '../_sample/Controllers/KittensController'
 
-
-
-
-describe("PROGRAM", () => {
+describe("Area", () => {
 	it("Can Access from Index", () => {
-		assert.isFunction(Program)
+		assert.isFunction(Area)
 	})
-	it("Register and Call controller methods with api call", (done) => {
+	it("Minimum setup", () => {
+		let x = new Area({
+			name: "Minimum",
+		})
+		assert.isTrue(x.channels.length == 0)
+	})
 
-		session(p.expressApp)
+	it("Can add controllers manually", (done) => {
+		let x = new Area({
+			name: "Adding Controllers",
+		})
+		x.AddControllers({ KittensController })
+		session(x.expressApp)
+			.request("get", "/kittens")
+			.timeout(2000)
+			.expect("Content-Type", /json/)
+			.expect(200)
+			.end(done)
+	})
+
+	it("Register and Call controller methods with api call", (done) => {
+		session(testArea.expressApp)
 			.request("get", "/kittens")
 			.timeout(2000)
 			.expect("Content-Type", /json/)

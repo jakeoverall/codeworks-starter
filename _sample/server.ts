@@ -1,4 +1,4 @@
-import { Program, EnableAuthorizeDecorator, EnableAuthorizedSocket } from "../lib";
+import { Area, EnableAuthorizeDecorator, EnableAuthorizedSocket } from "../lib";
 import sessions from "./sessions";
 import { ValuesChannel } from "./Channels/ValuesChannel";
 
@@ -10,7 +10,7 @@ let fakeDb = {
 
 let session = sessions.test()
 
-let p = new Program({
+let testArea = new Area({
   name: "TESTPROGRAM",
   controllersPath: __dirname + '/Controllers',
   staticFiles: __dirname + "/../../_sample/www",
@@ -33,9 +33,9 @@ let p = new Program({
   channels: [ValuesChannel],
   routerMount: "/"
 })
-p.configure.AuthService({
+testArea.configure.SessionUserService({
   Roles: ["public", "student", "teacher", "admin", "super"],
   UserRolePath: "account.role",
 })
 
-export default p
+export default testArea

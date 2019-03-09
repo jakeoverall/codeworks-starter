@@ -1,5 +1,5 @@
 import socketIO from 'socket.io'
-import { UserService } from '../Middleware/Authorize'
+import { SessionUser } from '../Middleware/Authorize'
 import { ErrorUnAuthorized, ErrorBadRequest } from "../Errors/Errors";
 
 export const COMMANDS = {

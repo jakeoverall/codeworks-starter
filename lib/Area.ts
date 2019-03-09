@@ -9,20 +9,20 @@ import { RequestHandler, NextFunction } from "express-serve-static-core";
 import socketio from 'socket.io'
 import { Channel } from "./Channels/Channel";
 
-export type IAppConfig = {
-  controllersPath: string,
-  routerMount: string,
+export type IAreaConfig = {
   name: string,
+  controllersPath?: string,
+  routerMount?: string,
   middleware?: Array<RequestHandler>
   sessionware?: Array<(socket: socketio.Socket, next: NextFunction) => void>
   staticFiles?: string,
   channels?: Array<typeof Channel>
 }
 
-export class Program {
+export class Area {
   private router: express.Router;
   private middleware: Array<RequestHandler>;
-  private sessionware: Array<(socket: socketio.Socket, next: NextFunction) => void>
+  private socketware: Array<(socket: socketio.Socket, next: NextFunction) => void>
   name: string
   configure: Startup;
   expressApp: express.Application;
@@ -30,42 +30,53 @@ export class Program {
   io: socketio.Server;
   channels: Array<typeof Channel>;
 
-  constructor(config: IAppConfig) {
-    this.configureApp(config);
+  constructor(config: IAreaConfig) {
+    this.configureArea(config);
     this.configureSockets(config);
     this.configureRouter(config);
   }
 
-  private configureApp(config: IAppConfig) {
+  private configureArea(config: IAreaConfig) {
     this.name = config.name;
-    this.routerMount = config.routerMount;
+    this.routerMount = config.routerMount || '/';
     this.configure = new Startup();
     this.expressApp = express();
+    this.expressApp.disable("x-powered-by")
     this.expressApp.use(bodyParser.json({ limit: '50mb' }));
     this.expressApp.use(bodyParser.urlencoded({ extended: true }));
-    this.configure.ControllerPath = config.controllersPath;
+    if (config.controllersPath) {
+      this.configure.ControllerPath = config.controllersPath;
+    }
     if (config.staticFiles) {
       this.expressApp.use(this.routerMount, express.static(config.staticFiles))
     }
   }
 
-  private configureSockets(config: IAppConfig) {
+  private configureSockets(config: IAreaConfig) {
     this.io = socketio();
-    this.sessionware = config.sessionware || [];
+    this.socketware = config.sessionware || [];
     this.channels = config.channels || [];
-    this.sessionware.forEach(fn => this.io.use(fn));
+    this.socketware.forEach(fn => this.io.use(fn));
     this.channels.forEach(channel => {
       new Channel(channel.name, this.io).OnConnected(channel.prototype)
     })
   }
 
-  private configureRouter(config: IAppConfig) {
+  private configureRouter(config: IAreaConfig) {
     this.middleware = config.middleware;
     this.router = Router();
     if (this.middleware) {
       this.expressApp.use(this.middleware);
     }
-    this.addControllers(this.configure.Controllers);
+    this.AddControllers(this.configure.Controllers);
+  }
+
+  /**
+   * Controllers must be decorated to be added to the area
+   * @param controllers 
+   */
+  public AddControllers(controllers: Dictionary<any>) {
+    this.addControllers(controllers)
     this.expressApp.use(this.routerMount, this.router);
   }
 
@@ -84,7 +95,6 @@ export class Program {
     })
     console.log(count + ` controllers configured.`);
   }
-
 
   private registerController(controller: any): Router {
 
