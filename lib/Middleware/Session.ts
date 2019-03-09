@@ -1,5 +1,5 @@
 import { NextFunction } from "express";
-import socketIO from 'socket.io'
+import { Socket } from 'socket.io'
 let expressSession = require("express-session");
 let sessionstore = require("sessionstore");
 
@@ -35,7 +35,7 @@ export class ISerializerConfig {
 export class SessionSerializer {
   private store: any;
   middleware: any;
-  socketSession: (socket: socketIO.Socket, next: NextFunction) => void;
+  socketSession: (socket: Socket, next: NextFunction) => void;
   constructor(config: ISerializerConfig) {
     this.store = this.createStore(config)
     this.middleware = this.createSession(config)

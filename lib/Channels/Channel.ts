@@ -1,4 +1,4 @@
-import socketIO from 'socket.io'
+import {Socket, Server} from 'socket.io'
 import { SessionUser } from '../Middleware/Authorize'
 import { ErrorUnAuthorized, ErrorBadRequest } from "../Errors/Errors";
 
@@ -26,9 +26,9 @@ const COMMANDMETHODS = {
 
 export class Channel {
   channelName: string;
-  io: socketIO.Server;
+  io: Server;
   name: string
-  constructor(channelName: string, io: socketIO.Server) {
+  constructor(channelName: string, io: Server) {
     if (!channelName || !io) { throw new Error("Unable to create channel you must provide a channelName and instance of io") }
     this.channelName = "/" + channelName
     this.io = io
@@ -41,7 +41,7 @@ export class Channel {
    * @param context 
    * @param socket 
    */
-  init(context: Channel, socket: socketIO.Socket): void {
+  init(context: Channel, socket: Socket): void {
     throw new Error("SUPER CHANNEL INIT WAS CALLED")
   }
 
@@ -66,7 +66,7 @@ export class Channel {
     this.io.of(this.channelName).emit(COMMANDS.USERDISCONNECTED, user);
   }
 
-  SendToMe(socket: socketIO.Socket, payload: any) {
+  SendToMe(socket: Socket, payload: any) {
     try {
       socket.emit(COMMANDS.SELFMESSAGE, payload)
     } catch (err) {
@@ -74,7 +74,7 @@ export class Channel {
     }
   }
 
-  SendToConnectionId(socket: socketIO.Socket, payload: any) {
+  SendToConnectionId(socket: Socket, payload: any) {
     let connectionId = payload.connectionId
     if (!connectionId) {
       return this.SendError(
@@ -86,11 +86,11 @@ export class Channel {
     this.io.to(connectionId).emit(COMMANDS.PRIVATEMESSAGE, payload)
   }
 
-  SendToChannel(socket: socketIO.Socket, payload: any) {
+  SendToChannel(socket: Socket, payload: any) {
     this.io.of(this.channelName).emit(COMMANDS.CHANNELMESSAGE, payload)
   }
 
-  SendToGroup(socket: socketIO.Socket, payload: any) {
+  SendToGroup(socket: Socket, payload: any) {
     if (!payload.groupName || !payload.data) {
       return this.SendError(socket, COMMANDS.GROUPMESSAGE, new ErrorBadRequest("Payload must specify groupName && data"))
     }
@@ -99,7 +99,7 @@ export class Channel {
     this.io.of(this.channelName).to(group).emit(COMMANDS.GROUPMESSAGE, payload)
   }
 
-  JoinGroup(socket: socketIO.Socket, groupName: string) {
+  JoinGroup(socket: Socket, groupName: string) {
     try {
       let group = this.channelName + ":" + groupName
       if (socket.rooms[group]) { return }
@@ -110,7 +110,7 @@ export class Channel {
     }
   }
 
-  LeaveGroup(socket: socketIO.Socket, groupName: string) {
+  LeaveGroup(socket: Socket, groupName: string) {
     try {
       let group = this.channelName + ":" + groupName
       if (!socket.rooms[group]) { return }
@@ -121,7 +121,7 @@ export class Channel {
     }
   }
 
-  SendError(socket: socketIO.Socket, command: string, err: Error) {
+  SendError(socket: Socket, command: string, err: Error) {
     try {
       socket.emit(COMMANDS.ERROR, { ...err, message: err.message, channel: this.channelName, command })
     } catch (err) {
@@ -129,7 +129,7 @@ export class Channel {
     }
   }
 
-  Authorize(role: string | number, socket: socketIO.Socket) {
+  Authorize(role: string | number, socket: Socket) {
     try {
       if (!socket.request['authService'].hasAccess(role)) {
         throw new ErrorUnAuthorized()

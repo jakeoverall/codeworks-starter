@@ -1,4 +1,4 @@
-import { Area, EnableAuthorizeDecorator, EnableAuthorizedSocket } from "../lib";
+import { Area, EnableAuthorizeDecorator, EnableSessionUserSocket } from "../lib";
 import sessions from "./sessions";
 import { ValuesChannel } from "./Channels/ValuesChannel";
 
@@ -28,7 +28,7 @@ let testArea = new Area({
       socket.request['user'] = fakeDb[socket.request['session'].uid]
       next()
     },
-    EnableAuthorizedSocket
+    EnableSessionUserSocket
   ],
   channels: [ValuesChannel],
   routerMount: "/"

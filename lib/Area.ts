@@ -6,7 +6,8 @@ import { Dictionary } from "./utils/Dictionary";
 import { IController } from "./Controllers/IController";
 import { Injector } from './utils/Injector'
 import { RequestHandler, NextFunction } from "express-serve-static-core";
-import socketio from 'socket.io'
+import socketio = require('socket.io')
+import { Socket, Server } from 'socket.io'
 import { Channel } from "./Channels/Channel";
 
 export type IAreaConfig = {
@@ -14,7 +15,7 @@ export type IAreaConfig = {
   controllersPath?: string,
   routerMount?: string,
   middleware?: Array<RequestHandler>
-  sessionware?: Array<(socket: socketio.Socket, next: NextFunction) => void>
+  sessionware?: Array<(socket: Socket, next: NextFunction) => void>
   staticFiles?: string,
   channels?: Array<typeof Channel>
 }
@@ -22,12 +23,12 @@ export type IAreaConfig = {
 export class Area {
   private router: express.Router;
   private middleware: Array<RequestHandler>;
-  private socketware: Array<(socket: socketio.Socket, next: NextFunction) => void>
+  private socketware: Array<(socket: Socket, next: NextFunction) => void>
   name: string
   configure: Startup;
   expressApp: express.Application;
   routerMount: string;
-  io: socketio.Server;
+  io: Server;
   channels: Array<typeof Channel>;
 
   constructor(config: IAreaConfig) {

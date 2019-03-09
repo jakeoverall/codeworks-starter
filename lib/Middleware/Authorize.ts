@@ -1,14 +1,14 @@
 import { getFromPath } from "../Extensions/Object";
 import { ErrorUnAuthorized } from "../Errors/Errors";
 import { RequestHandler, NextFunction } from "express-serve-static-core";
-import socketIO from 'socket.io'
+import { Socket } from 'socket.io'
 
 class SessionUserService {
   readonly Roles: Array<string | number>;
   readonly user: any;
   readonly role: any;
   session: any = {}
-  socket: socketIO.Socket;
+  socket: Socket;
   constructor(user: any, config: IUserSessionConfig) {
     this.user = user
     this.role = getFromPath(user, config.UserRolePath)
@@ -55,7 +55,7 @@ export const EnableAuthorizeDecorator: RequestHandler = (req, res, next) => {
 /**
  * To use you must have extended the socket.request to include user
  */
-export const EnableAuthorizedSocket = (socket: socketIO.Socket, next: NextFunction) => {
+export const EnableSessionUserSocket = (socket: Socket, next: NextFunction) => {
   socket.request['authService'] = new SessionUserService(socket.request['user'], __authConfig)
   next()
 }
