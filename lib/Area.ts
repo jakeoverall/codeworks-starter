@@ -115,9 +115,9 @@ export class Area {
 
   private registerRoute(route: any, controller: any, member: string, router) {
     let { middleware, method, path } = route.config;
-    let callBack = (req: Request, res: Response) => {
+    let callBack = (req: Request, res: Response, next: NextFunction) => {
       let c = Injector.resolve(controller);
-      return ((c)[member])(req, res);
+      return ((c)[member])(req, res, next);
     };
     if (middleware) {
       router[method](path, middleware, callBack);

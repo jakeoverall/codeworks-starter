@@ -1,8 +1,8 @@
 
-import { Controller, HttpGet, HttpPost, HttpPut, HttpDelete, SessionUser, Middleware, Authorize } from "../../lib";
+import { Controller, HttpGet, HttpPost, HttpPut, HttpDelete, SessionUser, Middleware, Authorize, BaseController } from "../../lib";
 
 @Controller("Account")
-export default class AccountController {
+export default class AccountController extends BaseController {
   @HttpGet()
   @Authorize("public")
   async Get() {

@@ -1,5 +1,5 @@
 import { Area, EnableAuthorizeDecorator, EnableSessionUserSocket } from "../lib";
-import sessions from "./sessions";
+// import sessions from "./sessions";
 import { ValuesChannel } from "./Channels/ValuesChannel";
 
 let fakeDb = {
@@ -8,14 +8,14 @@ let fakeDb = {
   "3c": { name: "Jake", account: { role: 'public' } }
 }
 
-let session = sessions.test()
+// let session = sessions.test()
 
 let testArea = new Area({
   name: "TESTPROGRAM",
   controllersPath: __dirname + '/Controllers',
   staticFiles: __dirname + "/../../_sample/www",
   middleware: [
-    session.middleware,
+    // session.middleware,
     (req, res, next) => {
       req['user'] = fakeDb[req['session'].uid]
       next()
@@ -23,7 +23,7 @@ let testArea = new Area({
     EnableAuthorizeDecorator
   ],
   sessionware: [
-    session.socketSession,
+    // session.socketSession,
     (socket, next) => {
       socket.request['user'] = fakeDb[socket.request['session'].uid]
       next()

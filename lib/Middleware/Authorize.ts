@@ -6,7 +6,7 @@ import { Socket } from 'socket.io'
 class SessionUserService {
   readonly Roles: Array<string | number>;
   readonly user: any;
-  readonly role: any;
+  readonly role: string | number;
   session: any = {}
   socket: Socket;
   constructor(user: any, config: IUserSessionConfig) {

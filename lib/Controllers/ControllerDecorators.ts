@@ -1,7 +1,9 @@
 import { ClassType } from "class-transformer/ClassTransformer";
 import { transformAndValidate } from "class-transformer-validator";
 import { guid } from "../utils/guid";
-import { IController } from "./IController";
+import { IController, HttpContext } from "./IController";
+
+
 export type RequestType = "get" | "post" | "put" | "delete"
 
 export function Controller(endpoint: string): ClassDecorator {
@@ -17,17 +19,20 @@ function HttpDecorator(method: RequestType, path: string) {
     const originalMethod = descriptor.value;
     extendTarget(target, key);
 
-    descriptor.value = async function (req, res) {
+    descriptor.value = async function (req, res, next) {
       try {
-        this.req = this.req || req
-        this.res = this.res || res
-        let args = [this.req.params, this.req.body, this.req.query]
+        this.HttpContext = this.HttpContext || new HttpContext(req, res, next)
+        let args = [req.params, req.body, this.HttpContext]
         let content = await originalMethod.apply(this, args)
         let response = { content, status: 200 }
-        this.res.send(response)
+        if (!this.res.headersSent) {
+          this.res.send(response)
+        }
       }
       catch (e) {
-        this.res.status(e.status || 400).send({ ...e, status: e.status, message: e.message })
+        if (!this.res.headersSent) {
+          this.res.status(e.status || 400).send({ ...e, status: e.status, message: e.message })
+        }
       }
     };
 
