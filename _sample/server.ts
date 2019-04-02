@@ -15,9 +15,9 @@ let testArea = new Area({
   controllersPath: __dirname + '/Controllers',
   staticFiles: __dirname + "/../../_sample/www",
   middleware: [
-    // session.middleware,
     (req, res, next) => {
-      req['user'] = fakeDb[req['session'].uid]
+      //ADD THE USER TO REQ SOMEHOW
+      req['user'] = fakeDb["2b"]
       next()
     },
     EnableAuthorizeDecorator

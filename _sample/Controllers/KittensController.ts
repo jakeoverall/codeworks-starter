@@ -1,4 +1,4 @@
-import { Controller, HttpGet, HttpPost, FromBody, Authorize, Middleware, SessionUser } from "../../lib";
+import { Controller, HttpGet, HttpPost, FromBody, Authorize, Middleware, SessionUser, HttpContext } from "../../lib";
 import { KittensService } from "../Services/KittensService";
 import { Kitten } from "../Models/Kitten";
 
@@ -17,7 +17,8 @@ export default class KittensController {
     console.log('MIDDLEWARE 2');
     next()
   }])
-  GetKittens(_) {
+  GetKittens(_, __, ctx: HttpContext) {
+    console.log('ctx', ctx)
     return this._ks.Find()
   }
 

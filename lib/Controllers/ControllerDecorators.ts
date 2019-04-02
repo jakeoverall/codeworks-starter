@@ -25,13 +25,13 @@ function HttpDecorator(method: RequestType, path: string) {
         let args = [req.params, req.body, this.HttpContext]
         let content = await originalMethod.apply(this, args)
         let response = { content, status: 200 }
-        if (!this.res.headersSent) {
-          this.res.send(response)
+        if (!this.HttpContext.res.headersSent) {
+          this.HttpContext.res.send(response)
         }
       }
       catch (e) {
-        if (!this.res.headersSent) {
-          this.res.status(e.status || 400).send({ ...e, status: e.status, message: e.message })
+        if (!this.HttpContext.res.headersSent) {
+          this.HttpContext.res.status(e.status || 400).send({ ...e, status: e.status, message: e.message })
         }
       }
     };

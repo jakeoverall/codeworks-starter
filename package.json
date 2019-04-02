@@ -1,6 +1,6 @@
 {
   "name": "codeworks-starter",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Typescript Express-Areas",
   "main": "dist/index.js",
   "files": [
@@ -87,10 +87,8 @@
     "class-validator": "^0.9.1",
     "cookie-parser": "^1.4.4",
     "express": "^4.16.4",
-    "jsonwebtoken": "^8.5.1",
     "node-cache": "^4.2.0",
     "reflect-metadata": "^0.1.13",
-    "retry": "^0.12.0",
     "socket.io": "^2.2.0",
     "typescript": "^3.4.1"
   }

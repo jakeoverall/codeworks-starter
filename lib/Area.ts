@@ -9,6 +9,7 @@ import { RequestHandler, NextFunction } from "express-serve-static-core";
 import socketio = require('socket.io')
 import { Socket, Server } from 'socket.io'
 import { Channel } from "./Channels/Channel";
+import cookieParser from 'cookie-parser'
 
 export type IAreaConfig = {
   name: string,
@@ -45,6 +46,7 @@ export class Area {
     this.expressApp.disable("x-powered-by")
     this.expressApp.use(bodyParser.json({ limit: '50mb' }));
     this.expressApp.use(bodyParser.urlencoded({ extended: true }));
+    this.expressApp.use(cookieParser())
     if (config.controllersPath) {
       this.configure.ControllerPath = config.controllersPath;
     }
