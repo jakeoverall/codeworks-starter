@@ -9,7 +9,7 @@ import { RequestHandler, NextFunction } from "express-serve-static-core";
 import socketio = require('socket.io')
 import { Socket, Server } from 'socket.io'
 import { Channel } from "./Channels/Channel";
-import cookieParser from 'cookie-parser'
+import cookieParser = require("cookie-parser");
 
 export type IAreaConfig = {
   name: string,

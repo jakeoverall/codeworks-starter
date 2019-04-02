@@ -1,4 +1,4 @@
-import NodeCache from 'node-cache';
+import NodeCache = require('node-cache');
 
 export class CacheService {
   cache: NodeCache;
